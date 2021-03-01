@@ -104,107 +104,23 @@ int mb_col_hits2(aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit2_ary
 {
 	if (f[0].qual < min_mq || f[1].qual < min_mq) return 2;
 	if (scfs->n_seq) {
-		/*if (a_cnt == 2) {*/
-			/*fprintf(stderr, "%u\t%u\n", a[0].tid, a[1].tid);*/
-			/*sd_seq_t *sq1 = &ctgs->seq[a[0].tid];*/
-			/*sd_seq_t *sq2 = &ctgs->seq[a[1].tid];*/
-
-			/*uint32_t ind1 = sq1->le; //maybe not well paired up*/
-			/*uint32_t ind2 = sq2->le;*/
-			/*if (ind1 == ind2) return 1;*/
-			/*fprintf(stderr, "%s\t%s\t%u\t%u\n", sq1->name, sq2->name, ind1, ind2);*/
-			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
-			/*uint32_t a0s = sq1->l_snp_n == a[0].rev ? sq1->rs + a[0].s : sq1->rs + sq1->len - a[0].s; */
-			/*uint32_t a1s = sq2->l_snp_n == a[1].rev ? sq2->rs + a[1].s : sq2->rs + sq2->len - a[1].s; */
-			
-			/*if (ind1 < ind2) {*/
-				/*uint64_t c1ns = (uint64_t)ind1 << 32 | a0s; //don't think there will be 2G contig, if happends might be a bug */
-				/*uint64_t c2ns = (uint64_t)ind2 << 32 | a1s; //don't think there will be 2G contig, if happends might be a bug */
-				/*hit_t h = (hit_t) {c1ns, a[0].rev, c2ns, a[1].rev}; */
-				/*hit_ary_push(hit_ary, &h);	*/
-			/*} else {*/
-				/*uint64_t c1ns = (uint64_t)ind2 << 32 | a1s; //don't think there will be 2G contig, if happends might be a bug */
-				/*uint64_t c2ns = (uint64_t)ind1 << 32 | a0s; //don't think there will be 2G contig, if happends might be a bug */
-				/*hit_t h = (hit_t) {c1ns, a[1].rev, c2ns, a[0].rev}; */
-				/*hit_ary_push(hit_ary, &h);	*/
-			/*}*/
-			/*return 0;*/
-		/*} else if (f_cnt == 2){*/
 			sd_seq_t *sq1 = &ctgs->seq[f[0].tid];
 			sd_seq_t *sq2 = &ctgs->seq[f[1].tid];
 			uint32_t ind1 = sq1->le; //maybe not well paired up
 			uint32_t ind2 = sq2->le;
-			/*uint32_t f0s = sq1->r_snp_n + f[0].s; */
-			/*uint32_t f1s = sq2->r_snp_n + f[1].s; */
 			uint32_t f0s = sq1->r_snp_n + (sq1->l_snp_n & 0x1 ? f[0].s : sq1->len - f[0].s);
 			uint32_t f1s = sq2->r_snp_n + (sq2->l_snp_n & 0x1? f[1].s : sq2->len - f[1].s);
 			fprintf(stdout, "%s\t%u\t%u\t%s/1\t%d\t%c\n", scfs->seq[ind1].name, f0s, f0s + 100, qn, f[0].qual, (f[0].rev ^ (sq1->l_snp_n & 0x1)) ? '-':'+');
 			fprintf(stdout, "%s\t%u\t%u\t%s/2\t%d\t%c\n", scfs->seq[ind2].name, f1s, f1s + 100, qn, f[1].qual, (f[1].rev ^ (sq2->l_snp_n & 0x1)) ? '-':'+');
-			if (ind1 != ind2) return 1;
-			/*if (f[0].tid > f[1].tid) {*/
-				/*if (f[0].tid - f[1].tid > 1) return 1;*/
-			/*} else {*/
-				/*if (f[1].tid - f[0].tid > 1) return 1;*/
-			/*}	*/
-			/*fprintf(stderr, "%s\t%u\t%s\t%u\n", sq1->name, f[0].s, sq2->name, f[1].s);*/
-			/*fprintf(stderr, "%s\t%u\t%u\t%u\t%u\t%u\t%u\n", scfs->seq[ind1].name, sq1->r_snp_n, scfs->seq[ind1].len, f0s, f1s, f[0].s, f[1].s);*/
-			/*if (scfs->seq[ind1].len < f0s || scfs->seq[ind1].len < f1s) fprintf(stderr, "larger\n");*/
-			/*fprintf(stderr, "%u\t%u\n", ind1, ind2);*/
-			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
-			/*uint32_t f0s = sq1->l_snp_n == f[0].rev ? sq1->rs + f[0].s : sq1->rs + sq1->len - f[0].s; */
-			/*uint32_t f1s = sq1->l_snp_n == f[1].rev ? sq2->rs + f[1].s : sq2->rs + sq2->len - f[1].s; */
-			/*fprintf(stderr, "%s\t%u\t%d\t%d\t%d\t%s\t%u\t%d\t%d\t%d\n", scfs->seq[ind1].name, f0s, f[0].qual, sq1->l_snp_n, f[0].rev, scfs->seq[ind2].name, f1s, f[1].qual, sq2->l_snp_n, f[1].rev);*/
-			if (f0s < f1s) {
-				hit2_t h = (hit2_t) {ind1, f0s, !!(f[0].rev ^ (sq1->l_snp_n & 0x1)), f1s, !!(f[1].rev ^ (sq2->l_snp_n & 0x1))}; 
-				hit2_ary_push(hit2_ary, &h);	
-			} else {
-				hit2_t h = (hit2_t) {ind2, f1s, !!(f[1].rev ^ (sq2->l_snp_n & 0x1)), f0s, !!(f[0].rev ^ (sq1->l_snp_n&0x1))}; 
-				hit2_ary_push(hit2_ary, &h);	
-			}
 			return 0;	
-		/*}*/
 	} else {
-		/*if (a_cnt == 2) {*/
-			/*uint32_t ind1 = a[0].tid; //maybe not well paired up*/
-			/*uint32_t ind2 = a[1].tid;*/
-			/*if (ind1 == ind2) return 1;*/
-			/*fprintf(stderr, "%u\t%u\n", ind1, ind2);*/
-			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
-			/*uint32_t is_l1 = check_left_half(ctgs->seq[ind1].le, ctgs->seq[ind1].rs, a[0].s);*/
-			/*if (is_l1 > 1) return 1; //middle won't be added*/
-			/*uint32_t is_l2 = check_left_half(ctgs->seq[ind2].le, ctgs->seq[ind2].rs, a[1].s);*/
-			/*if (is_l2 > 1) return 1; //middle won't be added*/
-			
-			/*if (ind1 < ind2) {*/
-				/*uint64_t c1ns = (uint64_t)ind1 << 32 | a[0].s; //don't think there will be 2G contig, if happends might be a bug */
-				/*uint64_t c2ns = (uint64_t)ind2 << 32 | a[1].s; //don't think there will be 2G contig, if happends might be a bug */
-				/*hit_t h = (hit_t) {c1ns, a[0].rev, c2ns, a[1].rev}; */
-				/*hit_ary_push(hit_ary, &h);	*/
-			/*} else {*/
-				/*uint64_t c1ns = (uint64_t)ind2 << 32 | a[1].s; //don't think there will be 2G contig, if happends might be a bug */
-				/*uint64_t c2ns = (uint64_t)ind1 << 32 | a[0].s; //don't think there will be 2G contig, if happends might be a bug */
-				/*hit_t h = (hit_t) {c1ns, a[1].rev, c2ns, a[0].rev}; */
-				/*hit_ary_push(hit_ary, &h);	*/
-			/*}*/
-			/*return 0;*/
-		/*} else if (f_cnt == 2){*/
 			uint32_t ind1 = f[0].tid;
 			uint32_t ind2 = f[1].tid;
-			if (ind1 != ind2) return 1;
 			uint32_t f0s = f[0].s;
 			uint32_t f1s = f[1].s;
-			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
-			if (f0s < f1s) {
-				hit2_t h = (hit2_t) {ind1, f0s, f[0].rev, f1s, f[1].rev}; 
-				hit2_ary_push(hit2_ary, &h);	
-			} else {
-				/*uint64_t c1ns = (uint64_t)ind2 << 32 | f[1].s; //don't think there will be 2G contig, if happends might be a bug */
-				/*uint64_t c2ns = (uint64_t)ind1 << 32 | f[0].s; //don't think there will be 2G contig, if happends might be a bug */
-				hit2_t h = (hit2_t) {ind2, f1s, f[1].rev, f0s, f[0].rev}; 
-				hit2_ary_push(hit2_ary, &h);	
-			}
+			fprintf(stdout, "%s\t%u\t%u\t%s/1\t%d\t%c\n", ctgs->seq[ind1].name, f0s, f0s + 100, qn, f[0].qual, (f[0].rev) ? '-':'+');
+			fprintf(stdout, "%s\t%u\t%u\t%s/2\t%d\t%c\n", ctgs->seq[ind2].name, f1s, f1s + 100, qn, f[1].qual, (f[1].rev) ? '-':'+');
 			return 0;	
-		/*}*/
 	}
 	return 1;
 }
@@ -309,201 +225,6 @@ int deflimn(cdict2_t *cds, sdict_t *ctgs)
 	fprintf(stderr, "%u\t%u\t%u\t%u\t%u\t%u\t%u\t%u\n", dstr[1], dstr[2], dstr[2], dstr[3], dstr[4], dstr[5], dstr[6], dstr[7]);
 }
 
-uint32_t *find_breaks2(cdict2_t *cds, sdict_t *ctgs, uint32_t *n_brks, int lim)
-{
-    uint32_t n_cds = ctgs->n_seq;
-	uint32_t i;
-	cdict2_t *c;
-    kvec_t(uint32_t) v;
-    kv_init(v);
-	for ( i = 0; i < n_cds; ++i) {
-        char *name = ctgs->seq[i].name;
-        uint32_t scf_idx = ctgs->seq[i].le;
-        uint32_t ctg_idx = i; 
-		uint32_t j;
-		c = cds + i;
-        uint32_t fgt, flt, s_ok, p_ok;
-        fgt = flt = s_ok = p_ok = 0;
-        int ctgn = 0;
-		for (j = 0; j < c->n_cnt; ++j) {
-		   uint32_t ctg_idx2 =  sd_get(ctgs, c->cnts[j].name);	
-            uint32_t scf_idx2 = ctgs->seq[ctg_idx2].le;
-			/*if (ctgn <= 50) fprintf(stderr, "%u\t%s\t%u\t%s\t%f\t%f\t%f\t%f\n", ctg_idx, name, ctg_idx2, ctgs->seq[ctg_idx2].name, c->cnts[j].cnt[0], c->cnts[j].cnt[1], c->cnts[j].cnt[2], c->cnts[j].cnt[3]);*/
-            if (scf_idx2 == scf_idx) {
-				++ctgn;
-				if (ctg_idx2 > ctg_idx) {
-					++fgt;
-					if (ctg_idx2 == ctg_idx + 1 && fgt < lim) s_ok = 1;
-				} else {
-					++flt;	
-					if (ctg_idx2 + 1 == ctg_idx && flt < lim) p_ok = 1;
-				}
-				/*if (ctg_idx2 > ctg_idx + 1) */
-					/*fgt = 1;*/
-				/*else if (ctg_idx2 + 1 == ctg_idx) */
-					/*flt = 1;	*/
-			}
-			if ((p_ok && s_ok) || (fgt + 1 > lim  && flt + 1 > lim)) 
-				break;
-        }
-		/*fprintf(stderr, "%s\t%d\n", name, ctgs->seq[ctg_idx].rs >> 1 & 1);*/
-		/*if (!s_ok) fprintf(stderr, "miss successor add a break\n");	*/
-		/*if (!p_ok) fprintf(stderr, "miss predecessor add a break\n");*/
-		//1 tail 2 head 3 head + tail 0 middle
-        if (!s_ok && (ctgs->seq[ctg_idx].rs & 1) == 0)  
-            kv_push(uint32_t, v, ctg_idx << 1 | 1);  
-        if (!p_ok && (ctgs->seq[ctg_idx].rs >> 1 & 1) == 0)  
-            kv_push(uint32_t, v, (ctg_idx - 1) << 1 | 1);  
-        /*if (ctgs->seq[ctg_idx].rs & 1) */
-            /*kv_push(uint32_t, v, ctg_idx << 1 | 1);  */
-	}
-    *n_brks = v.n;
-	return v.a;
-}
-uint32_t *find_breaks(cdict2_t *cds, sdict_t *ctgs, uint32_t *n_brks)
-{
-    uint32_t n_cds = ctgs->n_seq;
-	uint32_t i;
-	cdict2_t *c;
-    kvec_t(uint32_t) v;
-    kv_init(v);
-	for ( i = 0; i < n_cds; ++i) {
-        char *name = ctgs->seq[i].name;
-		/*uint32_t seq_idx = i;*/
-        uint32_t scf_idx = ctgs->seq[i].le;
-        uint32_t ctg_idx = i; 
-		/*uint32_t snpn = i&1 ? ctgs->seq[i>>1].l_snp_n:ctgs->seq[i>>1].r_snp_n;*/
-		uint32_t j, z;
-		c = cds + i;
-        uint32_t fgt, flt;
-        fgt = flt = 0;
-        int ctgn = 0;
-        /*float density[4];*/
-        uint32_t susp_hd = -1, susp_tl = -1;
-		for (j = 0; j < c->n_cnt; ++j) {
-            uint32_t sum = 0;
-            for ( z = 0; z < 4; ++z) sum += c->cnts[j].cnt[z];
-		   uint32_t ctg_idx2 =  sd_get(ctgs, c->cnts[j].name);	
-            uint32_t scf_idx2 = ctgs->seq[ctg_idx2].le;
-            /*fprintf(stderr, "%s\t%s\t%u\t%u\t%u\t%u\n", name, ctgs->seq[ctg_idx2].name, c->cnts[j].cnt[0], c->cnts[j].cnt[1], c->cnts[j].cnt[2], c->cnts[j].cnt[3]);*/
-            if (scf_idx2 == scf_idx) {
-                //is_suc 
-                uint32_t hh, ht, th, tt, tl, hd, tl2, hd2;
-                hh = c->cnts[j].cnt[0], ht = c->cnts[j].cnt[1], th = c->cnts[j].cnt[2], tt = c->cnts[j].cnt[3]; 
-                ctgn += 1;
-                /*for (z = 0; z < 4; ++z) density[z] = (float)c->cnts[j].cnt[z]/(z >> 1 ? ctgs->seq[ctg_idx].r_snp_n : ctgs->seq[ctg_idx].l_snp_n) / (z&0x1 ? ctgs->seq[ctg_idx2].r_snp_n : ctgs->seq[ctg_idx2].l_snp_n);*/
-                /*for (z = 0; z < 4; ++z) density[z] = (float)c->cnts[j].cnt[z]/((z >> 1 ? ctgs->seq[ctg_idx].r_snp_n : ctgs->seq[ctg_idx].l_snp_n) + (z&0x1 ? ctgs->seq[ctg_idx2].r_snp_n : ctgs->seq[ctg_idx2].l_snp_n));*/
-                /*for (z = 0; z < 4; ++z) density[z] = c->cnts[j].cnt[z]/(ctgs->seq[ctg_idx].r_snp_n + ctgs->seq[ctg_idx2].r_snp_n);*/
-				if (ctgn <= 50) fprintf(stderr, "%u\t%s\t%u\t%s\t%f\t%f\t%f\t%f\n", ctg_idx, name, ctg_idx2, ctgs->seq[ctg_idx2].name, c->cnts[j].cnt[0], c->cnts[j].cnt[1], c->cnts[j].cnt[2], c->cnts[j].cnt[3]);
-
-                    /*if (ctgn >= 10) break;*/
-                tl = th + tt;
-                hd = hh + ht;
-                hd2 = hh + th;
-                tl2 = ht + tt;
-                {
-                        if (ctg_idx2 > ctg_idx) {
-                            /*if (get_max(c->cnts[j].cnt, 4) > 1) {*/
-                            /*if (get_fmax(density, 4) > 1) {*/
-                            /*if (tl > hd || get_max(c->cnts[j].cnt, 4) > 1) {*/
-                            if (tl > hd || norm_cdf(hd, 0.5, tl + hd) <= 0.95) { //a very loose condition for successor otherwise cause many false positives
-                                if (fgt) continue;
-                                ++fgt;
-                                if (ctg_idx2 != ctg_idx + 1) {
-                                    fprintf(stderr, "n1: %s\t%s\n", name, ctgs->seq[ctg_idx2].name);
-                                    if (norm_cdf(tl, 0.5, tl + hd) > 0.95) kv_push(uint32_t, v, ctg_idx << 1 | 1);     
-                                    else susp_tl = j;
-                                } 
-                            } // a successor
-                            else {
-                                if (flt) continue;
-                                ++flt;
-                                fprintf(stderr, "n0: %s\t%s\n", name, ctgs->seq[ctg_idx2].name);
-                                if (!(ctgs->seq[ctg_idx].rs & 0x2)) kv_push(uint32_t, v, (ctg_idx - 1) << 1 | 1);         
-                            }  //precessor
-                        } else { //potential to be a precessor 
-                            /*if (get_max(c->cnts[j].cnt, 4) < 2) {*/
-                            /*if (get_fmax(density, 4) < 2) {*/
-                            /*if (tl < hd || get_max(c->cnts[j].cnt, 4) < 2) {*/
-                            if (tl < hd || norm_cdf(tl, 0.5, tl + hd) <= 0.95) {
-                                if (flt) continue;
-                                ++flt;
-                                if (ctg_idx2 + 1 != ctg_idx) {
-                                    fprintf(stderr, "m1: %s\t%s\n", name, ctgs->seq[ctg_idx2].name);
-                                    if (!(ctgs->seq[ctg_idx].rs & 0x2)) {
-                                        if (norm_cdf(hd, 0.5, tl + hd) > .95) kv_push(uint32_t, v, (ctg_idx - 1) << 1 | 1);         
-                                        else susp_hd = j;
-                                    }
-                                } 
-                            } // a predecessor
-                            else {
-                                if (fgt) continue;
-                                ++fgt;
-                                fprintf(stderr, "m0: %s\t%s\n", name, ctgs->seq[ctg_idx2].name);
-                                kv_push(uint32_t, v, ctg_idx << 1 | 1);         
-                            } // a successor 
-                        }
-                        //validate 
-                }
-            }
-            /*if (fgt && flt) break;*/
-        }
-		
-        if (susp_hd != 0xFFFFFFFF) {
-            int insert = 1;
-            for (j = susp_hd + 1; j < susp_hd + 2 && j < c->n_cnt; ++j) {
-                uint32_t sum = 0;
-                for ( z = 0; z < 4; ++z) sum += c->cnts[j].cnt[z]; 
-				uint32_t ctg_idx2 = sd_get(ctgs, c->cnts[j].name);
-                uint32_t scf_idx2 = ctgs->seq[ctg_idx2].le;
-                uint32_t hh, ht, th, tt, tl, hd, tl2, hd2;
-                hh = c->cnts[j].cnt[0], ht = c->cnts[j].cnt[1], th = c->cnts[j].cnt[2], tt = c->cnts[j].cnt[3]; 
-                tl = th + tt;
-                hd = hh + ht;
-                hd2 = hh + th;
-                tl2 = ht + tt;
-                if (scf_idx2 == scf_idx && ctg_idx2 + 1 == ctg_idx) {
-                fprintf(stderr, "val:%s\t%s\t%f\t%f\t%f\t%f\n", name, ctgs->seq[ctg_idx2].name, c->cnts[j].cnt[0], c->cnts[j].cnt[1], c->cnts[j].cnt[2], c->cnts[j].cnt[3]);
-                    if (hd > tl && norm_cdf(hd, 0.5, tl + hd) > 0.95) 
-                        insert = 0;
-                    break;   
-                } 
-            }
-            if (insert) kv_push(uint32_t, v, (ctg_idx - 1) << 1 | 1);      
-        }
-        if (susp_tl != 0xFFFFFFFF) {
-            int insert = 1;
-            for (j = susp_tl + 1; j < susp_tl + 2 && j < c->n_cnt; ++j) {
-                uint32_t sum = 0;
-                for ( z = 0; z < 4; ++z) sum += c->cnts[j].cnt[z]; 
-				uint32_t seq_idx2 = sd_get(ctgs, c->cnts[j].name);
-                uint32_t ctg_idx2 = ctgs->seq[seq_idx2].r_snp_n;
-                uint32_t scf_idx2 = ctgs->seq[ctg_idx2].le;
-                uint32_t hh, ht, th, tt, tl, hd, tl2, hd2;
-                hh = c->cnts[j].cnt[0], ht = c->cnts[j].cnt[1], th = c->cnts[j].cnt[2], tt = c->cnts[j].cnt[3]; 
-                tl = th + tt;
-                hd = hh + ht;
-                hd2 = hh + th;
-                tl2 = ht + tt;
-                if (scf_idx2 == scf_idx && ctg_idx2 == ctg_idx + 1) {
-                fprintf(stderr, "val:%s\t%s\t%f\t%f\t%f\t%f\n", name, ctgs->seq[ctg_idx2].name, c->cnts[j].cnt[0], c->cnts[j].cnt[1], c->cnts[j].cnt[2], c->cnts[j].cnt[3]);
-                    if (hd < tl && norm_cdf(tl, 0.5, tl + hd) >= 0.95) 
-                        insert = 0;
-                    break;   
-                } 
-            }
-            if (insert) kv_push(uint32_t, v, (ctg_idx) << 1 | 1);      
-        }
-        if (fgt == 0 && (ctgs->seq[ctg_idx].rs & 1) == 0) 
-            kv_push(uint32_t, v, ctg_idx << 1 | 1);  
-        if (flt == 0 && (ctgs->seq[ctg_idx].rs >> 1 & 1) == 0)  
-            kv_push(uint32_t, v, (ctg_idx - 1) << 1 | 1);  
-        /*if (ctgs->seq[ctg_idx].rs & 1) */
-            /*kv_push(uint32_t, v, ctg_idx << 1 | 1);  */
-	}
-    *n_brks = v.n;
-	return v.a;
-}
 
 int cal_cov_stat(cov_ary_t *ca, graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 {
@@ -739,6 +460,34 @@ int mb_proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit2_ary
 	kv_destroy(five);
 	return 0;
 }
+int col_ctgs(char *bam_fn, sdict_t *ctgs)
+{
+	bamFile fp;
+	bam_header_t *h;
+	bam1_t *b;
+	fp = bam_open(bam_fn, "r"); //should check if bam is sorted
+	if (fp == 0) {
+		fprintf(stderr, "[E::%s] fail to open %s\n", __func__, bam_fn);
+		return -1;
+	}
+	
+	h = bam_header_read(fp);
+	b = bam_init1();
+	int i;
+	for ( i = 0; i < h->n_targets; ++i) {
+		char *name = h->target_name[i];
+		uint32_t len = h->target_len[i];
+		uint32_t le = len >> 1;
+		uint32_t rs = (len >> 1) + 1;
+		uint32_t lenl, lenr;
+		lenl = lenr = len >> 1;
+		sd_put4(ctgs, name, len, le, rs, lenl, lenr, 0);
+	}
+	bam_destroy1(b);
+	bam_header_destroy(h);
+	bam_close(fp);
+	return 0;
+}
 int bam2hig_bed(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, char *out_fn)
 {
 	
@@ -748,15 +497,20 @@ int bam2hig_bed(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, char *out_
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] initiate contigs\n", __func__);
 #endif
-	graph_t *og = load_sat(sat_fn);
-	simp_graph(og);
-	mb_init_scaffs(og, ctgs, scfs);	
+	if (sat_fn && *sat_fn) {
+		graph_t *og = load_sat(sat_fn);
+		simp_graph(og);
+		mb_init_scaffs(og, ctgs, scfs);	
+		graph_destroy(og);
+		if (!scfs->n_seq) {
+			fprintf(stderr, "[E::%s] fail to collect scaffolds\n", __func__);	
+			return 1;
+		} 
+	} else {
+		col_ctgs(bam_fn[0], ctgs);	
+	}
 	if (!ctgs) {
 		fprintf(stderr, "[E::%s] fail to collect contigs\n", __func__);	
-		return 1;
-	} 
-	if (!scfs->n_seq) {
-		fprintf(stderr, "[E::%s] fail to collect scaffolds\n", __func__);	
 		return 1;
 	} 
 
@@ -772,72 +526,11 @@ int bam2hig_bed(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, char *out_
 		}	
 	}
 	free(hit2_ary->ary); free(hit2_ary);
-	graph_destroy(og);
 	sd_destroy(ctgs);
 	sd_destroy(scfs);
 	return 0;
 }
 
-int mk_brks(char *sat_fn, char *links_fn, int limn, char *out_fn)
-{
-#ifdef VERBOSE
-	fprintf(stderr, "[M::%s] loading SAT graph\n", __func__);
-#endif
-	graph_t *og = load_sat(sat_fn);
-#ifdef VERBOSE
-	fprintf(stderr, "[M::%s] simplify SAT graph\n", __func__);
-#endif
-	simp_graph(og);
-	sdict_t *ctgs = sd_init(); 
-	sdict_t *scfs = sd_init();
-#ifdef VERBOSE
-	fprintf(stderr, "[M::%s] initiate scaffolds\n", __func__);
-#endif
-	mb_init_scaffs(og, ctgs, scfs);
-	if (!ctgs) return 1;
-	uint32_t n_ctg = ctgs->n_seq;	
-	uint32_t i = 0;
-	/*fprintf(stderr, "%u\n", ctgs->n_seq);*/
-	cdict2_t* cds = calloc(n_ctg, sizeof(cdict2_t)); 
-	for ( i = 0; i < n_ctg; ++i) cd2_init(cds+i); 
-#ifdef VERBOSE
-	fprintf(stderr, "[M::%s] collecting links\n", __func__);
-#endif
-	mb_get_links_hic(links_fn, cds, ctgs);
-
-	/*for ( i = 0 ; i < n_ctg; ++i) {*/
-		/*fprintf(stderr, "%s\t%u\t%u\n", ctgs->seq[i].name, ctgs->seq[i].le, ctgs->seq[i].r_snp_n);*/
-	/*}*/
-#ifdef VERBOSE
-	fprintf(stderr, "[M::%s] normalize contact matrix\n", __func__);
-#endif
-    mb_norm_links(cds, ctgs);
-	/*return 0;*/
-     //sort cd2
-#ifdef VERBOSE
-	fprintf(stderr, "[M::%s] sort contact matrix\n", __func__);
-#endif
-	for ( i = 0; i < n_ctg; ++i) cd2_sort(cds+i); 
-
-	deflimn(cds, ctgs);
-	uint32_t n_brks;
-	uint32_t *brks = find_breaks2(cds, ctgs, &n_brks, limn);
-		
-#ifdef VERBOSE
-	fprintf(stderr, "[M::%s] cut paths\n", __func__);
-#endif
-	cut_paths(og, brks, n_brks, ctgs, scfs);
-#ifdef VERBOSE
-	fprintf(stderr, "[M::%s] dump sat graph\n", __func__);
-#endif
-	dump_sat(og, out_fn);	
-#ifdef VERBOSE
-	fprintf(stderr, "[M::%s] release memory resource\n", __func__);
-#endif
-	graph_destroy(og);
-	if (brks) free(brks);
-	return 0;
-}
 
 int main(int argc, char *argv[])
 {
@@ -857,19 +550,19 @@ int main(int argc, char *argv[])
 			default:
 				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
 help:	
-				fprintf(stderr, "\nUsage: %s [<options>] <SAT> <BAMs> ...\n", program);
+				fprintf(stderr, "\nUsage: %s [<options>] <BAMs> ...\n", program);
 				fprintf(stderr, "Options:\n");
+				fprintf(stderr, "         -s    FILE     SAT file [null]\n");
 				fprintf(stderr, "         -n    INT      allow successor or predecessor be top N candidates [2]\n");
 				fprintf(stderr, "         -o    FILE     output file [stdout]\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
 		}		
 	}
-	if (optind + 2 > argc) {
-		fprintf(stderr,"[E::%s] require a SAT and link matrix file!\n", __func__); goto help;
+	if (optind + 1 > argc) {
+		fprintf(stderr,"[E::%s] require bam file(s)!\n", __func__); goto help;
 	}
 	/*links_fn = argv[optind++];*/
-	sat_fn = argv[optind++];
 	char **bam_fn = argv + optind;
 	int n_bams = argc - optind;	
 	int min_mq = 10;

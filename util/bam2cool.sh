@@ -1,7 +1,6 @@
 bam2cool() {
-	local bams=$1
-	local sat=$2
-	local ref=$3
+	local ref=$1
+	local bams=${@:2}
 	./build_hig $sat $bams > alignment.bed 2>/dev/null
 	local bed=aligment.bed
 	samtools faidx $ref
@@ -15,16 +14,15 @@ bam2cool() {
 
 export -f bam2cool
 
-if [ $# -lt 3 ]
+if [ $# -lt 2 ]
 then
-	echo "bam2cool <bams> <sat> <ref>"
+	echo "bam2cool <ref> <bams>"
 	exit 1
 fi
 
-bams="$1"
-sat=$2
-ref=$3
+ref=$1
+bams="${@:2}"
 
-bam2cool "$bams"  $sat $ref  
+bam2cool $@ 
 
 
