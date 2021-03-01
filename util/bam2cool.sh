@@ -1,8 +1,8 @@
 bam2cool() {
 	local ref=$1
 	local bams=${@:2}
-	./build_hig $sat $bams > alignment.bed 2>/dev/null
 	local bed=aligment.bed
+	./bam2hig_bed $sat $bams > $bed 2>/dev/null
 	samtools faidx $ref
 	local base=`basename $bed .bed`
 	cut -f1,2 $ref.fai | sed 's/-/_/g' > $ref.chrom.sizes
