@@ -43,7 +43,7 @@ Given Hi-C reads alignment **bams**, a draft assembly **asm** and a output direc
 
 ```
 samtools faidx $asm 
-./bin/pin_hic_it -i $N -c $asm.fai -x $ref -O $outdir $bam1 $bam2 $bam3 ... 
+./bin/pin_hic_it -i $N -x $asm.fai -r $asm -O $outdir $bam1 $bam2 $bam3 ... 
 ```
 
 Or you want to build scaffolds step by step:
