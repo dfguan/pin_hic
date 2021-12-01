@@ -1,10 +1,10 @@
-# Pins (拼接)
+# Pin_hic (Hi-C拼接)
 
 Scaffolding tool based on Hi-C reads. 
 
 ## Overview
 
-Pin\_hic a scaffolder using Hi-C data. It applies a dual selection and local optimal strategy to bridge two contigs and output a SAT file for each iteration, the SAT format is the extension of GFA format which is able to record the scaffolding process, and can also be useful for further genomic analysis.
+Pin\_hic is a scaffolder using Hi-C data. It applies a dual selection and local optimal strategy to bridge two contigs and output a SAT file for each iteration, the SAT format is the extension of GFA format which is able to record the scaffolding process, and can also be useful for further genomic analysis.
 
 
 ## Dependencies
@@ -16,8 +16,8 @@ Pin\_hic a scaffolder using Hi-C data. It applies a dual selection and local opt
 Run the following commands to install pins:
 
 ```
-git clone https://github.com/dfguan/pins.git
-cd pins/src && make
+git clone https://github.com/dfguan/pin_hic.git
+cd pin_hic/src && make
 
 ```
 

@@ -59,7 +59,7 @@ sdict_t *col_ctgs_from_graph(graph_t *g)
 		/*path_len += (pt[ca->pn[i]>>1].n - 1) * 200;	 //gap size = 200	*/
 		sd_put4(ctgs, pt[ca->pn[i]>>1].name, pt[ca->pn[i]>>1].len, 0, 0, 0, 0, pt[ca->pn[i]>>1].is_circ);
 	} 
-	for (uint32_t i = 0; i < ctgs->n_seq; ++i) fprintf(stderr, "ctgs: %s %d\n", ctgs->seq[i].name, ctgs->seq[i].is_circ);
+	/*for (uint32_t i = 0; i < ctgs->n_seq; ++i) fprintf(stderr, "ctgs: %s %d\n", ctgs->seq[i].name, ctgs->seq[i].is_circ);*/
 	return ctgs;
 }
 
@@ -473,7 +473,7 @@ graph_t *nns_mst(cdict2_t *cds, sdict_t *ctgs)
 	}
 	for (i = 0; i < ctgs->n_seq; ++i) ctgs->seq[i].snp_n -= idx[i];
 	mets.n = j;
-	for (i = 0; i < mets.n; ++i)  fprintf(stderr, "E\t%s\t%s\t%u\t%u\t%f\n", ctgs->seq[in_mst[i].s].name, ctgs->seq[in_mst[i].d].name, ctgs->seq[in_mst[i].s].len, ctgs->seq[in_mst[i].d].len, in_mst[i].wt*10000);
+	/*for (i = 0; i < mets.n; ++i)  fprintf(stderr, "E\t%s\t%s\t%u\t%u\t%f\n", ctgs->seq[in_mst[i].s].name, ctgs->seq[in_mst[i].d].name, ctgs->seq[in_mst[i].s].len, ctgs->seq[in_mst[i].d].len, in_mst[i].wt*10000);*/
 	// double the edges and index
 	for (i = 0; i < j; ++i) {
 		uint32_t v = mets.a[i].s;
