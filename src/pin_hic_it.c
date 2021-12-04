@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <getopt.h>
+#include <sys/stat.h>
 
 #include "col_hic_lnks.h"
 #include "build_graph.h"
@@ -118,13 +119,13 @@ help:
 				fprintf(stderr, "         -i    INT      iteration times [3]\n");
 				fprintf(stderr, "         -a    BOOL     accurate mode [FALSE]\n");
 				fprintf(stderr, "         -g    BOOL     use middle part of contigs [FALSE]\n");
-				fprintf(stderr, "         -p    BOOL     use product [FALSE]\n");
+				fprintf(stderr, "         -p    BOOL     use product for normalization [FALSE]\n");
 				fprintf(stderr, "         -O    STR      output directory [.]\n");
 				fprintf(stderr, "         -q    INT      minimum mapping quality [10]\n");
 				fprintf(stderr, "         -w    INT      minimum contact number [100]\n");
 				fprintf(stderr, "         -m    FLOAT    minimum coverage ratio between maximu coverage and the gap coverage [.3]\n");
 				fprintf(stderr, "         -n    BOOL     use unnormalized weight [FALSE]\n");
-				fprintf(stderr, "         -d    FLOAT     minimum difference between best and secondary orientation [0.95]\n");
+				fprintf(stderr, "         -d    FLOAT    minimum difference between best and secondary orientation [0.95]\n");
 				fprintf(stderr, "         -b    BOOL     do not break at the final step [FALSE]\n");
 				fprintf(stderr, "         -c    INT      candidate number [3]\n");
 				fprintf(stderr, "         -e    BOOL     use unnormalized weight as edge weight [FALSE]\n");
@@ -149,7 +150,12 @@ help:
 		fprintf(stderr,"[E::%s] require a sat file or a reference index file!\n", __func__); goto help;
 	}
 	if (sat_fn && !seq_fn) {
-		fprintf(stderr,"[W::%s] reference file not supplied, contigs should be all in sat file!\n", __func__); goto help;
+		fprintf(stderr,"[W::%s] reference file not supplied, contigs should be all in sat file!\n", __func__); 
+	}
+	//check directory exists
+	struct stat st;
+	if( stat(outdir, &st) != 0 ) {
+		fprintf(stderr,"[E::%s] output directory %s does not exist, please create it first!\n", __func__, outdir); return 1;
 	}
 	fprintf(stderr, "Program starts\n");
 	//start iteration
