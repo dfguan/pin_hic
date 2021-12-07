@@ -539,8 +539,11 @@ int main(int argc, char *argv[])
 	int limn = 2;
 	char *program = argv[0];
 	/*--argc, ++argv;*/
-	while (~(c=getopt(argc, argv, "n:o:h"))) {
+	while (~(c=getopt(argc, argv, "s:n:o:h"))) {
 		switch (c) {
+			case 's':
+				sat_fn = optarg;
+				break;	
 			case 'n':
 				limn = atoi(optarg);
 				break;	

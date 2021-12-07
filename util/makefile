@@ -1,6 +1,6 @@
 CC      =  gcc
-#CFLAGS  =  -g -Wall -D VERBOSE -D PRINT_COVERAGE #-O2  
-CFLAGS  =  -O2 -Wall -D VERBOSE -D PRINT_COVERAGE -I ../src #-O2  
+CFLAGS  =  -g -Wall -D VERBOSE -D PRINT_COVERAGE -I ../src#-O2  
+#CFLAGS  =  -O2 -Wall -D VERBOSE -D PRINT_COVERAGE -I ../src #-O2  
 LDFLAGS = -lz -lm
 
 #OBJS = gfa.o opt.o paf.o sdict.o eg.o 
