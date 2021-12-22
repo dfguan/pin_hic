@@ -269,6 +269,8 @@ int mb_init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 	uint32_t n = as->n;
 	uint32_t i;	
 	/*for (i = 0; i < g->vtx.n; ++i) sd_put(ctgs, vt[i].name);	*/
+	FILE *chrsf = fopen("chrom.sizes", "w");
+		
 	for ( i = 0; i < n; ++i) {
 		uint32_t m = pt[as->pn[i] >> 1].n;
 		/*fprintf(stderr, "%d\n", as->pn[i]); */
@@ -293,14 +295,17 @@ int mb_init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 			if (!j) 
 				ctgs->seq[sid].rs = 2;
 			if (j == m - 1) 
-				ctgs->seq[sid].rs |= 1, len += len_ctg;
-			else 
-				len += len_ctg + 200;
+				ctgs->seq[sid].rs |= 1; 
+			len += len_ctg;
+			/*else */
+				/*len += len_ctg + 200;*/
 		}
 		//reset scaffold length le rs l_snp_n, r_snp_n
+		fprintf(chrsf, "%s %u\n", pt[as->pn[i]>>1].name, len);
 		sd_put4(scfs, pt[as->pn[i]>>1].name, len, len >> 1, (len >>1) + 1, len >> 1, len >> 1, pt[as->pn[i]>>1].is_circ);
 		/*free(p);*/
 	}
+	fclose(chrsf);
 	return 0;
 }
 int cmp_brks(const void *a, const void *b)
